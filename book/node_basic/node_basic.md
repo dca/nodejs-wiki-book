@@ -68,17 +68,31 @@ server = http.createServer(function (req, res) {
 
 重新啟動 Node.js 程式後，在瀏覽器端測試一下路徑行為，結果如下圖，
 
-.. image:: ../images/zh-tw/node_basic_rout_test.png
-   :scale: 100%
-   :align: center
+![node_basic_rout_test](../../old/images/zh-tw/node_basic_rout_test.png)
 
-當在瀏覽器輸入http://127.0.0.1:1337/test ，在伺服器端會收到兩個要求，一個是我們輸入的/test 要求，另外一個則是 /favicon.ico。
+
+當在瀏覽器輸入 http://127.0.0.1:1337/test ，在伺服器端會收到兩個要求，一個是我們輸入的 /test 要求，另外一個則是 /favicon.ico。
 /test 的路徑要求，http 伺服器本身需要經過程式設定才有辦法回應給瀏覽器端所需要的回應，在伺服器中所有的路徑要求都是需要被解析才有辦法取得資料。
-從上面解說可以了解到在node.js 當中所有的路徑都需要經過設定，未經過設定的路由會讓瀏覽器無法取得任何資料導致錯誤頁面的發生，底下將會解說如何設定路由，同時避免發生錯誤情形。
-先前node.js 程式需要增加一些修改，才能讓使用者透過瀏覽器，在不同路徑時有不同的結果。根據剛才的程式做如下的修改，
+從上面解說可以了解到在 Node.js 當中所有的路徑都需要經過設定，未經過設定的路由會讓瀏覽器無法取得任何資料導致錯誤頁面的發生，底下將會解說如何設定路由，同時避免發生錯誤情形。
+先前 Node.js 程式需要增加一些修改，才能讓使用者透過瀏覽器，在不同路徑時有不同的結果。根據剛才的程式做如下的修改，
 
-.. literalinclude:: ../src/node_basic_http_rout_done.js
-   :language: javascript
+```javascript
+var server,
+    ip   = "127.0.0.1",
+    port = 1337,
+    http = require('http'),
+    url = require('url');
+
+server = http.createServer(function (req, res) {
+  console.log(req.url);
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('hello world\n');
+});
+
+server.listen(port, ip);
+
+console.log('Server running at http://' + ip + ':' + port);
+```
 
 程式做了片段的修改，首先載入url 模組，另外增加一個path 變數。
 url 模組就跟如同他的命名一般，專門處理url 字串處理，裡面提供了許多方法來解決路徑上的問題。
@@ -86,9 +100,9 @@ url 模組就跟如同他的命名一般，專門處理url 字串處理，裡面
 
 在這邊使用url.parse 的方法，裡面帶入網址格式資料，會回傳路徑資料。為了後需方便使用，將回傳的資料設定到path 變數當中。在回傳的路徑資料，裡面包含資訊，如下圖，
 
-.. image:: ../images/zh-tw/node_basic_rout_url.png
-   :scale: 100%
-   :align: center
+![](../../old/images/zh-tw/node_basic_rout_url.png)
+
+
 
 這邊只需要使用單純的路徑要求，直接取用path.pathname ，就可以達到我們的目的。
 
