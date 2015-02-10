@@ -246,65 +246,120 @@ fs.readFile(filePath, encode, function(err, file) {
 });
 ```
 
-到這邊為止基本的程式內容都已經完成，剩下一些細節的調整。首先路徑上必須做調整，目前的靜態檔案全部都放置於 **static 資料夾** 底下，設定一個變數來記住資料夾位置。
+到這邊為止基本的程式內容都已經完成，剩下一些細節的調整。首先路徑上必須做調整，目前的靜態檔案全部都放置於 `static` 資料夾底下，設定一個變數來記住資料夾位置。
 
-接著將瀏覽器發出要求路徑與資料夾組合，讀取正確html 靜態檔案。使用者有可能會輸入錯誤路徑，所以在讀取檔案的時候要加入錯誤處理，同時回應 **404** 伺服器無法正確回應的 http header 格式。
+接著將瀏覽器發出要求路徑與資料夾組合，讀取正確 HTML 靜態檔案。使用者有可能會輸入錯誤路徑，所以在讀取檔案的時候要加入錯誤處理，同時回應 `404` 伺服器無法正確回應的 http header 格式。
 
-加入這些細節的修改，一個基本的http 靜態 html 輸出伺服器就完成了，完整程式碼如下，
+加入這些細節的修改，一個基本 的http 靜態 HTML 輸出伺服器就完成了，完整程式碼如下，
 
-.. literalinclude:: ../src/node_basic_file_http_static.js
-   :language: javascript
+**./src/node_basic_file_http_static.js**
+
+```javascript
+var server,
+    ip   = "127.0.0.1",
+    port = 1337,
+    http = require('http'),
+    fs = require("fs"),
+    folderPath = "static",
+    url = require('url'),
+    path,
+    filePath,
+    encode = "utf8";
+
+server = http.createServer(function (req, res) {
+  path = url.parse(req.url);
+  filePath = folderPath + path.pathname;
+
+  fs.readFile(filePath, encode, function(err, file) {
+    if (err) {
+      res.writeHead(404, {'Content-Type': 'text/plain'});
+      res.end();
+      return;
+    }
+
+    res.writeHead(200, {'Content-Type': 'text/application'});
+    res.write(file);
+    res.end();
+  });
+});
+
+server.listen(port, ip);
+
+console.log("Server running at http://" + ip + ":" + port);
+```
 
 
-node.js http GET 資料擷取
-========================
+## Node.js http GET 資料擷取
 
-http 伺服器中，除了路由之外另一個最常使用的方法就是擷取GET 資料。本單元將會介紹如何透過基本http 伺服器擷取瀏覽器傳來的要求，擷取GET 資料。
+http 伺服器中，除了路由之外另一個最常使用的方法就是擷取 GET 資料。本單元將會介紹如何透過基本 http 伺服器擷取瀏覽器傳來的要求，擷取 GET 資料。
 
 在http 協定中，GET 參數都是藉由URL 從瀏覽器發出要求送至伺服器端，基本的傳送網址格式可能如下，
 
 ::
+```
+http://127.0.0.1/test?send=1&test=2
+```
 
-    http://127.0.0.1/test?send=1&test=2
+上面這段網址，裡面的 GET 參數就是 send 而這個變數的數值就為 1，如果想要在http 伺服器取得 GET 資料，需要在瀏覽器給予的 要求(request) 做處理，
 
-上面這段網址，裡面的GET 參數就是 send 而這個變數的數值就為 1，如果想要在http 伺服器取得GET 資料，需要在瀏覽器給予的要求(request)做處理，
-
-首先需要載入 **query string** 這個模組，這個模組主要是用來將字串資料過濾後，轉換成 **javascript 物件**。
+首先需要載入 `query string` 這個模組，這個模組主要是用來將字串資料過濾後，轉換成 **JavaScript 物件**。
 
 
-.. code-block:: javascript
-    
-    qs = require('querystring');
+```javascript
+var qs = require('querystring');
+```
 
 接著在第一階段，利用url 模組過濾瀏覽器發出的URL 資料後，將回應的物件裡面的 query 這個變數，是一個字串值，資料過濾後如下，
 
 ..
-
-    send=1&test=2
+```
+send=1&test=2
+```
 
 透過 query string ，使用parse 這個方法將資料轉換成javascript 物件，就表示 GET 的資料已經被伺服器端正式擷取下來，
 
-.. code-block:: javascript
+```javascript
+path = url.parse(req.url);      
+parameter = qs.parse(path.query);
+```
 
-    path = url.parse(req.url);      
-    parameter = qs.parse(path.query);
+整個 Node.js http GET 參數完整擷取程式碼如下，
 
-整個node.js http GET 參數完整擷取程式碼如下，
+**./src/node_basic_http_get.js**
+```javascript
+var server,
+    ip   = "127.0.0.1",
+    port = 1337,
+    http = require('http'),
+    qs = require('querystring'),
+    url = require('url');
 
-.. literalinclude:: ../src/node_basic_http_get.js
-   :language: javascript
+server = http.createServer(function (req, res) {
+  var path = url.parse(req.url),
+      parameter = qs.parse(path.query);
 
-程式運作之後，由瀏覽器輸入要求網址之後，node.js 伺服器端回應資料為，
+  console.dir(parameter);
 
-::
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.write('Browser test GET parameter\n');
+  res.end();
+});
 
-    Server running at http://127.0.0.1:1337
-    { send: '1', test: '1' }
+server.listen(port, ip);
+
+console.log("Server running at http://" + ip + ":" + port);
+```
 
 
+程式運作之後，由瀏覽器輸入要求網址之後，Node.js 伺服器端回應資料為，
 
-本章結語
-=======
+```
+Server running at http://127.0.0.1:1337
+{ send: '1', test: '1' }
+```
 
-前面所解說的部份，一大部分主要是處理 http 伺服器基本問題，雖然在某些部分有牽扯到http 伺服器基本運作原理，主要還是希望可以藉由這些基本範例練習node.js ，練習回應函式與語法串接的特點，習慣編寫javascript 風格程式。當然直接這樣開發node.js 是非常辛苦的，接下來在模組實戰開發的部份將會介紹特定的模組，一步一步帶領各位從無到有進行node.js 應用程式開發。
+
+## 本章結語
+
+前面所解說的部份，一大部分主要是處理 http 伺服器基本問題，雖然在某些部分有牽扯到 http 伺服器基本運作原理，主要還是希望可以藉由這些基本範例練習 Node.js ，練習回應函式與語法串接的特點，習慣編寫 JavaScript 風格程式。當然直接這樣開發 Node.js 是非常辛苦的，接下來在模組實戰開發的部份將會介紹特定的模組，一步一步帶領各位從無到有進行 Node.js 應用程式開發。
 
