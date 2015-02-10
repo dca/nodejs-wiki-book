@@ -98,7 +98,7 @@ console.log('Server running at http://' + ip + ':' + port);
 `url` 模組就跟如同他的命名一般，專門處理 url 字串處理，裡面提供了許多方法來解決路徑上的問題。
 因為從瀏覽器發出的要求路徑可能會帶有多種需求，或者 GET 參數組合等。因此我們需要將路徑單純化，取用路徑部分的資料即可，例如使用者可能會送出 http://127.0.0.1:1337/test?send=1 ，如果直接信任 **req.url** 就會收到結果為 /test?send=1 ，所以需要透過 `url` 模組的方法將路徑資料過濾。
 
-在這邊使用url.parse 的方法，裡面帶入網址格式資料，會回傳路徑資料。為了後需方便使用，將回傳的資料設定到path 變數當中。在回傳的路徑資料，裡面包含資訊，如下圖，
+在這邊使用 `url.parse` 的方法，裡面帶入網址格式資料，會回傳路徑資料。為了後需方便使用，將回傳的資料設定到 path 變數當中。在回傳的路徑資料，裡面包含資訊，如下圖，
 
 ![node_basic_rout_url](../../old/images/zh-tw/node_basic_rout_url.png)
 
@@ -156,7 +156,7 @@ fs.readFile(filename, encode, function(err, file) {
 ![node_basic_file_byte](../../old/images/zh-tw/node_basic_file_byte.png)
 
 
-**回應函式** 中裡面會使用兩個變數，error 為錯誤資訊，如果讀取的檔案不存在，或者發生錯誤，error 數值會是 true ，如果成功讀取資料 error 將會是 false 。 content 則是檔案內容，資料讀取後將會把資料全數丟到content 這個變數當中。
+**回應函式** 中裡面會使用兩個變數，error 為錯誤資訊，如果讀取的檔案不存在，或者發生錯誤，error 數值會是 `true` ，如果成功讀取資料 error 將會是 `false` 。 content 則是檔案內容，資料讀取後將會把資料全數丟到 content 這個變數當中。
 
 最後程式的輸出結果畫面如下，
 
@@ -236,7 +236,7 @@ fs.readFile(filePath, encode, function(err, file) {
 });
 ```
 
-readFile 的回應函式裡面加入頁面輸出，讓瀏覽器可以正確讀到檔案，在這邊我們設定讀取的檔案為 html 靜態檔案，所以 Content-type 設定為 **text/html** 。讀取到檔案的內容，將會正確輸出成 html 靜態檔案。
+`readFile` 的回應函式裡面加入頁面輸出，讓瀏覽器可以正確讀到檔案，在這邊我們設定讀取的檔案為 html 靜態檔案，所以 Content-type 設定為 `text/html` 。讀取到檔案的內容，將會正確輸出成 HTML 靜態檔案。
 
 ```javascript
 fs.readFile(filePath, encode, function(err, file) {
@@ -293,14 +293,14 @@ console.log("Server running at http://" + ip + ":" + port);
 
 http 伺服器中，除了路由之外另一個最常使用的方法就是擷取 GET 資料。本單元將會介紹如何透過基本 http 伺服器擷取瀏覽器傳來的要求，擷取 GET 資料。
 
-在http 協定中，GET 參數都是藉由URL 從瀏覽器發出要求送至伺服器端，基本的傳送網址格式可能如下，
+在 http 協定中，GET 參數都是藉由URL 從瀏覽器發出要求送至伺服器端，基本的傳送網址格式可能如下，
 
 ::
 ```
 http://127.0.0.1/test?send=1&test=2
 ```
 
-上面這段網址，裡面的 GET 參數就是 send 而這個變數的數值就為 1，如果想要在http 伺服器取得 GET 資料，需要在瀏覽器給予的 要求(request) 做處理，
+上面這段網址，裡面的 GET 參數就是 send 而這個變數的數值就為 1，如果想要在 http 伺服器取得 GET 資料，需要在瀏覽器給予的 要求(request) 做處理，
 
 首先需要載入 `query string` 這個模組，這個模組主要是用來將字串資料過濾後，轉換成 **JavaScript 物件**。
 
@@ -309,18 +309,18 @@ http://127.0.0.1/test?send=1&test=2
 var qs = require('querystring');
 ```
 
-接著在第一階段，利用url 模組過濾瀏覽器發出的URL 資料後，將回應的物件裡面的 query 這個變數，是一個字串值，資料過濾後如下，
+接著在第一階段，利用 `url` 模組過濾瀏覽器發出的 URL 資料後，將回應的物件裡面的 `query` 這個變數，是一個字串值，資料過濾後如下，
 
 ..
 ```
 send=1&test=2
 ```
 
-透過 query string ，使用parse 這個方法將資料轉換成javascript 物件，就表示 GET 的資料已經被伺服器端正式擷取下來，
+透過 query string ，使用 `parse` 這個方法將資料轉換成 JavaScript 物件，就表示 GET 的資料已經被伺服器端正式擷取下來，
 
 ```javascript
-path = url.parse(req.url);      
-parameter = qs.parse(path.query);
+var path = url.parse(req.url);
+var parameter = qs.parse(path.query);
 ```
 
 整個 Node.js http GET 參數完整擷取程式碼如下，
